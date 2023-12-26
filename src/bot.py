@@ -1,5 +1,6 @@
 import os
 import uuid
+import logging
 import requests
 from telegram.ext import (
     Application,
@@ -12,13 +13,31 @@ from telegram import Update
 TOKEN = os.environ['BOT_TOKEN']
 FILE_PATH_OGG = "voice.ogg"
 FILE_PATH_MP3 = "voice.mp3"
+logger = logging.getLogger('my_logger')
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler('my_log_file.log')
+file_handler.setLevel(logging.DEBUG)
+
+stdout_handler = logging.StreamHandler()
+stdout_handler.setLevel(logging.INFO)  # Set the level as needed
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+stdout_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(stdout_handler)
 
 
 async def process_voice_message(update, context):
+    logger.info("Start processing file")
     file = await update.message.voice.get_file()
     await file.download_to_drive(FILE_PATH_OGG)
+    logger.info("File downloaded")
     convert_ogg_to_mp3()
+    logger.info("File converted to mp3")
     text = convert_audio_to_text()
+    logger.info("File converted to text")
     await update.message.reply_text(text)
 
 
@@ -42,12 +61,13 @@ def get_token():
     data = {
         'scope': api_version
     }
-
+    logger.info("Starting getting token")
     response = requests.post(url, headers=headers, data=data, verify=False)
     if response.status_code != 200:
-        print(response.status_code)
-        print(response.json())
+        logger.info(response.status_code)
+        logger.info(response.json())
         raise Exception
+    logger.info("Successfully get token")
     return response.json()
 
 
@@ -65,17 +85,24 @@ def convert_audio_to_text():
     with open(file_path, "rb") as audio_file:
         audio_data = audio_file.read()
 
+    logger.info("Starting converting audio to text")
     response = requests.post(url, headers=headers, data=audio_data, verify=False)
 
-    if response.status_code == 200:
-        result = response.json()['result'][0]
-        return result
+    if response.status_code != 200:
+        logger.error(response.status_code)
+        logger.error(response.json())
+        raise Exception
+    result = response.json()['result'][0]
+    return result
 
 
-
-if __name__ == "__main__":
+def main():
     application = (
         Application.builder().token(TOKEN).build()
     )
     application.add_handler(MessageHandler(filters.VOICE, process_voice_message))
     application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
