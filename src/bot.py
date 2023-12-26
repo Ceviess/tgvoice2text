@@ -44,6 +44,10 @@ def get_token():
     }
 
     response = requests.post(url, headers=headers, data=data, verify=False)
+    if response.status_code != 200:
+        print(response.status_code)
+        print(response.json())
+        raise Exception
     return response.json()
 
 
