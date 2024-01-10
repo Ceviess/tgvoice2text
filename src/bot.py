@@ -10,7 +10,7 @@ Functions:
 - process_voice_message(update: telegram.Update, context: telegram.ext.CallbackContext) -> None:
     Process a voice message from a Telegram update.
 - convert_ogg_to_mp3() -> None: Convert an OGG audio file to MP3 format.
-- get_token() -> dict: Obtain an authentication token for API access.
+- get_token() -> str: Obtain an authentication token for API access.
 - convert_audio_to_text() -> str: Convert audio to text using Sber's speech recognition API.
 - main(): Main function to run the Telegram bot application.
 """
@@ -66,7 +66,7 @@ def convert_ogg_to_mp3() -> None:
     ogg_audio.export(FILE_PATH_MP3, format="mp3")
 
 
-def get_token() -> dict:
+def get_token() -> str:
     """
     Obtain a token for authentication.
 
