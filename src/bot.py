@@ -21,7 +21,7 @@ import requests
 from telegram.ext import Application, MessageHandler, filters, CallbackContext
 from telegram import Update
 from pydub import AudioSegment
-from src.constants import (
+from constants import (
     FILE_PATH_OGG,
     FILE_PATH_MP3,
     TOKEN_URL,
@@ -29,7 +29,7 @@ from src.constants import (
     SPEECH_URL,
     TIMEOUT,
 )
-from src.utils import get_logger
+from utils import get_logger
 
 TOKEN = os.environ["BOT_TOKEN"]
 logger = get_logger("main")

@@ -8,14 +8,6 @@ WORKDIR /app
 
 RUN pip install urllib3==2.1.0 pydub python-telegram-bot requests --break-system-packages
 
-COPY src/bot.py ./
+COPY src /src
 
-CMD ["python3", "./bot.py"]
-
-# COPY test.sh ./
-#
-# # Set permissions for the script
-# RUN chmod +x ./test.sh
-#
-# # Start the endless script when the container starts
-# CMD ["./test.sh"]
+CMD ["python3", "/src/bot.py"]
